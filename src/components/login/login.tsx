@@ -18,17 +18,19 @@ import { useAuth } from "@/context/auth-context/use-auth";
 import { useEffect, useState } from "react";
 import { supabase } from "@/utils/supabase";
 import { useNavigate } from "@tanstack/react-router";
+import { handleSignIn, type Login } from "@/components/login/login-utils";
 
 export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
   const navigate = useNavigate();
-  const [login, setLogin] = useState({
+  const [login, setLogin] = useState<Login>({
     email: "",
     password: "",
     loading: false,
     error: false,
+    errorMessage: "",
   });
   const { signIn, setSession } = useAuth();
   useEffect(() => {
@@ -40,31 +42,6 @@ export function LoginForm({
     });
   }, []);
 
-  const handleSignIn = async (e: React.SubmitEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setLogin((prev) => ({
-      ...prev,
-      loading: true,
-    }));
-    try {
-      const result = await signIn(login.email, login.password);
-      if (result.success) {
-        navigate({ to: "/dashboard" });
-      }
-    } catch (err) {
-      console.error(err);
-      setLogin((prev) => ({
-        ...prev,
-        error: true,
-      }));
-    } finally {
-      setLogin((prev) => ({
-        ...prev,
-        loading: false,
-      }));
-    }
-  };
-
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
@@ -75,7 +52,18 @@ export function LoginForm({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={(e) => handleSignIn(e)}>
+          <form
+            onSubmit={(e) =>
+              handleSignIn(
+                e,
+                setLogin,
+                login.email,
+                login.password,
+                signIn,
+                navigate,
+              )
+            }
+          >
             <FieldGroup>
               <Field>
                 <FieldLabel htmlFor="email">Email</FieldLabel>
@@ -84,6 +72,8 @@ export function LoginForm({
                     setLogin((prev) => ({
                       ...prev,
                       email: e.target.value,
+                      error: false,
+                      errorMessage: "",
                     }));
                   }}
                   id="email"
@@ -107,6 +97,8 @@ export function LoginForm({
                     setLogin((prev) => ({
                       ...prev,
                       password: e.target.value,
+                      error: false,
+                      errorMessage: "",
                     }));
                   }}
                   id="password"
@@ -116,15 +108,16 @@ export function LoginForm({
               </Field>
               <Field>
                 <Button type="submit">Login</Button>
-
+                {login.error && (
+                  <p className="text-red-500 text-center">
+                    {login.errorMessage}
+                  </p>
+                )}
                 <FieldDescription className="text-center">
                   Don&apos;t have an account? <a href="/sign-up">Sign up</a>
                 </FieldDescription>
               </Field>
             </FieldGroup>
-            {login.error && (
-              <p className="text-red-500 text-center">{login.error}</p>
-            )}
           </form>
         </CardContent>
       </Card>

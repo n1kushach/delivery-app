@@ -7,19 +7,21 @@ import { useAuth } from "@/context/auth-context/use-auth";
 import { useEffect, useState } from "react";
 import { supabase } from "@/utils/supabase";
 import { useNavigate } from "@tanstack/react-router";
+import { handleSignUp, type SignUp } from "@/components/sign-up/sign-up-utils";
 
 export function SignUpForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
   const navigate = useNavigate();
-  const [login, setLogin] = useState({
+  const [signUp, setSignUp] = useState<SignUp>({
     email: "",
     password: "",
     loading: false,
     error: false,
   });
   const { signUpNewUser, setSession } = useAuth();
+
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
@@ -28,31 +30,6 @@ export function SignUpForm({
       setSession(session);
     });
   }, []);
-
-  const handleSignUp = async (e: React.SubmitEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setLogin((prev) => ({
-      ...prev,
-      loading: true,
-    }));
-    try {
-      const result = await signUpNewUser(login.email, login.password);
-      if (result.success) {
-        navigate({ to: "/dashboard" });
-      }
-    } catch (err) {
-      console.error(err);
-      setLogin((prev) => ({
-        ...prev,
-        error: true,
-      }));
-    } finally {
-      setLogin((prev) => ({
-        ...prev,
-        loading: false,
-      }));
-    }
-  };
 
   return (
     <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
@@ -63,13 +40,24 @@ export function SignUpForm({
               <CardTitle>Create a new account</CardTitle>
             </CardHeader>
             <CardContent>
-              <form onSubmit={(e) => handleSignUp(e)}>
+              <form
+                onSubmit={(e) =>
+                  handleSignUp(
+                    e,
+                    signUpNewUser,
+                    signUp.email,
+                    signUp.password,
+                    setSignUp,
+                    navigate,
+                  )
+                }
+              >
                 <FieldGroup>
                   <Field>
                     <FieldLabel htmlFor="email">Email</FieldLabel>
                     <Input
                       onChange={(e) => {
-                        setLogin((prev) => ({
+                        setSignUp((prev) => ({
                           ...prev,
                           email: e.target.value,
                         }));
@@ -77,7 +65,6 @@ export function SignUpForm({
                       id="email"
                       type="email"
                       placeholder="m@example.com"
-                      required
                     />
                   </Field>
                   <Field>
@@ -86,14 +73,13 @@ export function SignUpForm({
                     </div>
                     <Input
                       onChange={(e) => {
-                        setLogin((prev) => ({
+                        setSignUp((prev) => ({
                           ...prev,
                           password: e.target.value,
                         }));
                       }}
                       id="password"
                       type="password"
-                      required
                     />
                   </Field>
                   <Field>
@@ -109,8 +95,8 @@ export function SignUpForm({
                     </Button>
                   </Field>
                 </FieldGroup>
-                {login.error && (
-                  <p className="text-red-500 text-center">{login.error}</p>
+                {signUp.error && (
+                  <p className="text-red-500 text-center">{signUp.error}</p>
                 )}
               </form>
             </CardContent>
