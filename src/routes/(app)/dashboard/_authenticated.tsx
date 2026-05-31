@@ -6,7 +6,7 @@ import {
   redirect,
 } from "@tanstack/react-router";
 
-export const Route = createFileRoute("/dashboard/_authenticated")({
+export const Route = createFileRoute("/(app)/dashboard/_authenticated")({
   beforeLoad: async ({ location }) => {
     console.log("TEST");
     try {
