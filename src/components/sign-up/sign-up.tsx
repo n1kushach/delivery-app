@@ -1,92 +1,167 @@
-import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
-import { useAuth } from "@/context/auth-context/use-auth";
-import { useEffect, useState } from "react";
-import { supabase } from "@/utils/supabase";
-import { useNavigate } from "@tanstack/react-router";
-import { handleSignUp, type SignUp } from "@/components/sign-up/sign-up-utils";
+import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Field,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+} from '@/components/ui/field';
+import { Input } from '@/components/ui/input';
+import { useAuth } from '@/context/auth-context/use-auth';
+import { useState } from 'react';
+import { useNavigate } from '@tanstack/react-router';
+import { useForm } from '@tanstack/react-form';
+import { SignUpSchema } from '@/schemas/sign-up/sign-up.schema';
+import { toast } from 'sonner';
 
 export function SignUpForm({
   className,
   ...props
-}: React.ComponentProps<"div">) {
+}: React.ComponentProps<'div'>) {
   const navigate = useNavigate();
-  const [signUp, setSignUp] = useState<SignUp>({
-    email: "",
-    password: "",
-    loading: false,
-    error: false,
-  });
-  const { signUpNewUser, setSession } = useAuth();
+  const [loading, setLoading] = useState(false);
+  const { signUpNewUser } = useAuth();
 
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-    });
-    supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-    });
-  }, []);
+  const form = useForm({
+    defaultValues: {
+      email: '',
+      password: '',
+      confirmPassword: '',
+    },
+    validators: {
+      onSubmitAsync: SignUpSchema,
+    },
+    onSubmit: async ({ value }) => {
+      setLoading(true);
+      const { success } = await signUpNewUser(value.email, value.password);
+      if (success) {
+        navigate({ to: '/dashboard' });
+      }
+      if (!success) {
+        toast.error('Error signing up', {
+          position: 'top-right',
+        });
+      }
+      setLoading(false);
+    },
+  });
 
   return (
     <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
       <div className="w-full max-w-sm">
-        <div className={cn("flex flex-col gap-6", className)} {...props}>
+        <div className={cn('flex flex-col gap-6', className)} {...props}>
           <Card>
             <CardHeader>
               <CardTitle>Create a new account</CardTitle>
             </CardHeader>
             <CardContent>
               <form
-                onSubmit={(e) =>
-                  handleSignUp(
-                    e,
-                    signUpNewUser,
-                    signUp.email,
-                    signUp.password,
-                    setSignUp,
-                    navigate,
-                  )
-                }
+                onSubmit={e => {
+                  e.preventDefault();
+                  form.handleSubmit();
+                }}
               >
                 <FieldGroup>
+                  <form.Field
+                    name="email"
+                    children={field => {
+                      const isInvalid =
+                        field.state.meta.isTouched && !field.state.meta.isValid;
+                      return (
+                        <Field data-invalid={isInvalid}>
+                          <FieldLabel htmlFor={field.name}>Email</FieldLabel>
+                          <Input
+                            disabled={loading}
+                            id={field.name}
+                            name={field.name}
+                            value={field.state.value}
+                            onBlur={field.handleBlur}
+                            onChange={e => {
+                              field.handleChange(e.target.value);
+                            }}
+                            aria-invalid={isInvalid}
+                            placeholder="sample@email.com"
+                            autoComplete="off"
+                          />
+                          {isInvalid && (
+                            <FieldError errors={field.state.meta.errors} />
+                          )}
+                        </Field>
+                      );
+                    }}
+                  />
                   <Field>
-                    <FieldLabel htmlFor="email">Email</FieldLabel>
-                    <Input
-                      onChange={(e) => {
-                        setSignUp((prev) => ({
-                          ...prev,
-                          email: e.target.value,
-                        }));
+                    <form.Field
+                      name="password"
+                      children={field => {
+                        const isInvalid =
+                          field.state.meta.isTouched &&
+                          !field.state.meta.isValid;
+                        return (
+                          <Field data-invalid={isInvalid}>
+                            <FieldLabel htmlFor={field.name}>
+                              Password
+                            </FieldLabel>
+                            <Input
+                              disabled={loading}
+                              id={field.name}
+                              type="password"
+                              name={field.name}
+                              value={field.state.value}
+                              onBlur={field.handleBlur}
+                              onChange={e => field.handleChange(e.target.value)}
+                              aria-invalid={isInvalid}
+                              placeholder=""
+                              autoComplete="off"
+                            />
+                            {isInvalid && (
+                              <FieldError errors={field.state.meta.errors} />
+                            )}
+                          </Field>
+                        );
                       }}
-                      id="email"
-                      type="email"
-                      placeholder="m@example.com"
                     />
                   </Field>
                   <Field>
-                    <div className="flex items-center">
-                      <FieldLabel htmlFor="password">Password</FieldLabel>
-                    </div>
-                    <Input
-                      onChange={(e) => {
-                        setSignUp((prev) => ({
-                          ...prev,
-                          password: e.target.value,
-                        }));
+                    <form.Field
+                      name="confirmPassword"
+                      children={field => {
+                        const isInvalid =
+                          field.state.meta.isTouched &&
+                          !field.state.meta.isValid;
+                        return (
+                          <Field data-invalid={isInvalid}>
+                            <FieldLabel htmlFor={field.name}>
+                              Confirm password
+                            </FieldLabel>
+                            <Input
+                              disabled={loading}
+                              id={field.name}
+                              type="password"
+                              name={field.name}
+                              value={field.state.value}
+                              onBlur={field.handleBlur}
+                              onChange={e => field.handleChange(e.target.value)}
+                              aria-invalid={isInvalid}
+                              placeholder=""
+                              autoComplete="off"
+                            />
+                            {isInvalid && (
+                              <FieldError errors={field.state.meta.errors} />
+                            )}
+                          </Field>
+                        );
                       }}
-                      id="password"
-                      type="password"
                     />
                   </Field>
                   <Field>
-                    <Button type="submit">Sign up</Button>
+                    <Button type="submit">
+                      {loading ? 'Signing up' : 'Sign up'}
+                    </Button>
                     <Button
                       onClick={() => {
-                        navigate({ to: "/" });
+                        navigate({ to: '/' });
                       }}
                       variant="outline"
                       type="button"
@@ -95,9 +170,6 @@ export function SignUpForm({
                     </Button>
                   </Field>
                 </FieldGroup>
-                {signUp.error && (
-                  <p className="text-red-500 text-center">{signUp.error}</p>
-                )}
               </form>
             </CardContent>
           </Card>

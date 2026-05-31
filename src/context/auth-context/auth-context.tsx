@@ -1,7 +1,7 @@
 import type {
   SignInResult,
   SignUpResult,
-} from "@/context/auth-context/auth-context-provider";
+} from "@/context/auth-context/auth-context-utils";
 import type { Session } from "@supabase/supabase-js";
 import { createContext } from "react";
 

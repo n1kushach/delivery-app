@@ -4,6 +4,7 @@ import { createRouter, RouterProvider } from "@tanstack/react-router";
 import "./index.css";
 import { routeTree } from "./routeTree.gen";
 import { AuthContextProvider } from "@/context/auth-context/auth-context-provider";
+import { Toaster } from "@/components/ui/sonner";
 
 export const router = createRouter({
   routeTree,
@@ -21,5 +22,6 @@ createRoot(document.getElementById("root")!).render(
     <AuthContextProvider>
       <RouterProvider router={router} />
     </AuthContextProvider>
+    <Toaster />
   </StrictMode>,
 );
