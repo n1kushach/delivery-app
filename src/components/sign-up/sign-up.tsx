@@ -34,12 +34,12 @@ export function SignUpForm({
     },
     onSubmit: async ({ value }) => {
       setLoading(true);
-      const { success } = await signUpNewUser(value.email, value.password);
-      if (success) {
+      const result = await signUpNewUser(value.email, value.password);
+      if (result.success) {
         navigate({ to: '/dashboard' });
       }
-      if (!success) {
-        toast.error('Error signing up', {
+      if (!result.success) {
+        toast.error(result.message, {
           position: 'top-right',
         });
       }
@@ -156,10 +156,11 @@ export function SignUpForm({
                     />
                   </Field>
                   <Field>
-                    <Button type="submit">
+                    <Button role="button" type="submit">
                       {loading ? 'Signing up' : 'Sign up'}
                     </Button>
                     <Button
+                      role="button"
                       onClick={() => {
                         navigate({ to: '/' });
                       }}
