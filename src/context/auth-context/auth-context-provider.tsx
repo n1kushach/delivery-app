@@ -1,12 +1,12 @@
-import { AuthContext } from "@/context/auth-context/auth-context";
+import { AuthContext } from '@/context/auth-context/auth-context';
 import {
   signIn,
   signOut,
   signUpNewUser,
-} from "@/context/auth-context/auth-context-utils";
-import { supabase } from "@/utils/supabase";
-import type { Session } from "@supabase/supabase-js";
-import React, { useEffect, useState } from "react";
+} from '@/context/auth-context/auth-context-utils';
+import { supabase } from '@/utils/supabase';
+import type { Session } from '@supabase/supabase-js';
+import React, { useEffect, useState } from 'react';
 
 export const AuthContextProvider = ({
   children,

@@ -26,6 +26,8 @@ export function SignUpForm({
   const form = useForm({
     defaultValues: {
       email: '',
+      name: '',
+      phone: '',
       password: '',
       confirmPassword: '',
     },
@@ -34,7 +36,12 @@ export function SignUpForm({
     },
     onSubmit: async ({ value }) => {
       setLoading(true);
-      const result = await signUpNewUser(value.email, value.password);
+      const result = await signUpNewUser(
+        value.email,
+        value.password,
+        value.name,
+        value.phone
+      );
       if (result.success) {
         navigate({ to: '/dashboard' });
       }
@@ -82,6 +89,62 @@ export function SignUpForm({
                             }}
                             aria-invalid={isInvalid}
                             placeholder="sample@email.com"
+                            autoComplete="off"
+                          />
+                          {isInvalid && (
+                            <FieldError errors={field.state.meta.errors} />
+                          )}
+                        </Field>
+                      );
+                    }}
+                  />
+                  <form.Field
+                    name="name"
+                    children={field => {
+                      const isInvalid =
+                        field.state.meta.isTouched && !field.state.meta.isValid;
+                      return (
+                        <Field data-invalid={isInvalid}>
+                          <FieldLabel htmlFor={field.name}>Name</FieldLabel>
+                          <Input
+                            disabled={loading}
+                            id={field.name}
+                            name={field.name}
+                            value={field.state.value}
+                            onBlur={field.handleBlur}
+                            onChange={e => {
+                              field.handleChange(e.target.value);
+                            }}
+                            aria-invalid={isInvalid}
+                            placeholder="John Doe"
+                            autoComplete="off"
+                          />
+                          {isInvalid && (
+                            <FieldError errors={field.state.meta.errors} />
+                          )}
+                        </Field>
+                      );
+                    }}
+                  />
+                  <form.Field
+                    name="phone"
+                    children={field => {
+                      const isInvalid =
+                        field.state.meta.isTouched && !field.state.meta.isValid;
+                      return (
+                        <Field data-invalid={isInvalid}>
+                          <FieldLabel htmlFor={field.name}>Phone</FieldLabel>
+                          <Input
+                            disabled={loading}
+                            id={field.name}
+                            name={field.name}
+                            value={field.state.value}
+                            onBlur={field.handleBlur}
+                            onChange={e => {
+                              field.handleChange(e.target.value);
+                            }}
+                            aria-invalid={isInvalid}
+                            placeholder="+995XXXXXXXXX"
                             autoComplete="off"
                           />
                           {isInvalid && (

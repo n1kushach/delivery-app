@@ -1,6 +1,8 @@
 import { supabase } from '@/utils/supabase';
 import type { AuthError, Session, User } from '@supabase/supabase-js';
 
+export type Role = 'customer' | 'driver';
+
 export type SignUpResult =
   | { success: false; error: AuthError; message: string }
   | { success: true; data: { user: User | null; session: Session | null } };
@@ -12,11 +14,19 @@ export type SignInResult =
 //sign-up
 export const signUpNewUser = async (
   email: string,
-  password: string
+  password: string,
+  name: string,
+  phone: string
 ): Promise<SignUpResult> => {
   const { data, error } = await supabase.auth.signUp({
     email: email,
     password: password,
+    options: {
+      data: {
+        name: name,
+        phone: phone,
+      },
+    },
   });
   if (error) {
     console.error('There was an error signing up: ', error.message);
