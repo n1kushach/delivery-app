@@ -8,9 +8,6 @@ export const SignUpSchema = z
       .min(1, 'Name is required')
       .min(8, 'Name must be at least 8 characters long')
       .regex(/^[a-zA-Zა-ჰ\s]+$/, 'Name can only contain letters'),
-    // role: z.enum(['customer', 'driver'], {
-    //   error: 'Role is required',
-    // }),
     phone: z
       .string()
       .trim()

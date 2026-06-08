@@ -1,5 +1,3 @@
-import React from 'react';
-
 type ErrorVariant = 'inline' | 'page' | 'banner';
 
 type DashboardErrorProps = {
@@ -27,7 +25,7 @@ const DashboardError = ({
 
   if (variant === 'page') {
     return (
-      <div className="flex min-h-[400px] flex-col items-center justify-center gap-4 text-center">
+      <div className="flex min-h-100 flex-col items-center justify-center gap-4 text-center">
         <div className="flex h-16 w-16 items-center justify-center rounded-full bg-red-100 text-red-500">
           <ErrorIcon size={32} />
         </div>
