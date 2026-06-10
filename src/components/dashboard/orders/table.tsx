@@ -1,93 +1,32 @@
-import { useEffect, useState } from 'react';
 import {
-  createColumnHelper,
   flexRender,
   getCoreRowModel,
   useReactTable,
 } from '@tanstack/react-table';
-import type { Orders } from '@/types/orders.types';
-import { supabase } from '@/utils/supabase';
 import OrdersSkeleton from '@/components/dashboard/orders/orders.skeleton';
-import StatusBadge from '@/components/dashboard/status-badge';
 import DashboardError from '@/components/dashboard/error';
-
-const columnHelper = createColumnHelper<Orders>();
-
-const columns = [
-  columnHelper.accessor('address', {
-    id: 'address',
-    size: 180,
-    header: 'Address',
-    cell: i => i.getValue(),
-  }),
-  columnHelper.accessor('city', {
-    id: 'city',
-    size: 120,
-    header: 'City',
-    cell: i => i.getValue(),
-  }),
-  columnHelper.accessor('full_name', {
-    id: 'full_name',
-    size: 160,
-    header: 'Full Name',
-    cell: i => i.getValue(),
-  }),
-  columnHelper.accessor('notes', {
-    id: 'notes',
-    size: 200,
-    header: 'Notes',
-    cell: i => i.getValue(),
-  }),
-  columnHelper.accessor('phone', {
-    id: 'phone',
-    size: 140,
-    header: 'Phone',
-    cell: i => i.getValue(),
-  }),
-  columnHelper.accessor('status', {
-    id: 'status',
-    size: 120,
-    header: 'Status',
-    cell: i => <StatusBadge value={i.getValue()} />,
-  }),
-  columnHelper.accessor('total_price', {
-    id: 'total_price',
-    size: 100,
-    header: 'Total',
-    cell: i => `$${i.getValue()}`,
-  }),
-];
+import { useQuery } from '@tanstack/react-query';
+import { fetchOrders } from '@/services/orders/orders.service';
+import { ORDER_COLUMNS } from '@/components/dashboard/orders/table.util';
 
 const OrdersTable = () => {
-  const [orders, setOrders] = useState<Orders[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const {
+    data,
+    isLoading: loading,
+    error,
+  } = useQuery({
+    queryKey: ['orders'],
+    queryFn: fetchOrders,
+  });
 
-  useEffect(() => {
-    const fetchOrders = async () => {
-      const { data, error } = await supabase
-        .from('orders')
-        .select('*')
-        .order('created_at', { ascending: false });
-      if (error) {
-        setError(error.message);
-      }
-      if (!error) {
-        setOrders(data);
-      }
-      setLoading(false);
-    };
-
-    fetchOrders();
-  }, []);
   const table = useReactTable({
-    data: orders,
-    columns,
+    data: data ?? [],
+    columns: ORDER_COLUMNS,
     getCoreRowModel: getCoreRowModel(),
   });
 
   if (loading) return <OrdersSkeleton />;
-  if (error) return <DashboardError message={error} variant="page" />;
+  if (error) return <DashboardError message={error.message} variant="page" />;
 
   return (
     <div className="overflow-x-auto rounded-xl border border-gray-200 shadow-sm">

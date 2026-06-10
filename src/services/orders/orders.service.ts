@@ -10,20 +10,21 @@ export type TOrder = {
   total_price: string;
 };
 
-export const getOrders = async () => {
-  const { data, error } = await supabase.from('orders').select('*');
-  if (error) {
-    console.error('There was an error getting orders', error.message);
-    return { success: false, error: error };
-  }
-  return { success: true, data: data };
+export const fetchOrders = async () => {
+  const { data, error } = await supabase
+    .from('orders')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if (error) throw new Error(error.message);
+  return data;
 };
 
 export const addOrder = async (order: TOrder) => {
   const { data, error } = await supabase.from('orders').insert([order]);
   if (error) {
     console.error('There was an error adding order,', error.message);
-    return { success: false, error: error, message: error.message };
+    throw new Error(error.message);
   }
   return { success: true, data: data };
 };

@@ -24,10 +24,9 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { CreateOrderSchema } from '@/schemas/create-order/create-order.schema';
-import { addOrder } from '@/services/orders/orders.service';
+import { addOrder, type TOrder } from '@/services/orders/orders.service';
 import { useForm } from '@tanstack/react-form';
-import { useState } from 'react';
-import { toast } from 'sonner';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 interface IOrdersModal {
   open: boolean;
@@ -36,7 +35,33 @@ interface IOrdersModal {
 
 const OrdersModal = (props: IOrdersModal) => {
   const { open, setOpen } = props;
-  const [loading, setLoading] = useState(false);
+  const queryClient = useQueryClient();
+  const { mutate, isPending: loading } = useMutation({
+    mutationFn: async (newOrder: TOrder) => {
+      await addOrder(newOrder);
+    },
+    onMutate: async newOrder => {
+      setOpen(false);
+      await queryClient.cancelQueries({ queryKey: ['orders'] });
+
+      const previousOrders = queryClient.getQueryData<TOrder[]>(['orders']);
+
+      queryClient.setQueryData<TOrder[]>(['orders'], old => [
+        newOrder,
+        ...(old ?? []),
+      ]);
+
+      return { previousOrders };
+    },
+    onError: (_err, _newOrder, context) => {
+      queryClient.setQueryData(['orders'], context?.previousOrders);
+    },
+
+    // Uncomment if refetch needed onSuccess
+    // onSettled: () => {
+    //   queryClient.invalidateQueries({ queryKey: ['orders'] });
+    // },
+  });
   const form = useForm({
     defaultValues: {
       full_name: '',
@@ -51,9 +76,7 @@ const OrdersModal = (props: IOrdersModal) => {
       onSubmitAsync: CreateOrderSchema,
     },
     onSubmit: async ({ value }) => {
-      console.log(value, 'value');
-      setLoading(true);
-      const result = await addOrder({
+      mutate({
         full_name: value.full_name,
         phone: value.phone,
         address: value.address,
@@ -62,15 +85,6 @@ const OrdersModal = (props: IOrdersModal) => {
         notes: value.notes,
         total_price: value.total_price,
       });
-      if (result.success) {
-        setOpen(false);
-      }
-      if (!result.success) {
-        toast.error(result.message, {
-          position: 'top-right',
-        });
-      }
-      setLoading(false);
     },
   });
 
