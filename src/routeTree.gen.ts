@@ -14,6 +14,7 @@ import { Route as authSignUpRouteImport } from './routes/(auth)/sign-up'
 import { Route as appDashboardAuthenticatedRouteImport } from './routes/(app)/dashboard/_authenticated'
 import { Route as appDashboardAuthenticatedIndexRouteImport } from './routes/(app)/dashboard/_authenticated/index'
 import { Route as appDashboardAuthenticatedOrdersIndexRouteImport } from './routes/(app)/dashboard/_authenticated/orders/index'
+import { Route as appDashboardAuthenticatedOrdersOrderIdIndexRouteImport } from './routes/(app)/dashboard/_authenticated/orders/$orderId/index'
 
 const authIndexRoute = authIndexRouteImport.update({
   id: '/(auth)/',
@@ -43,6 +44,12 @@ const appDashboardAuthenticatedOrdersIndexRoute =
     path: '/orders/',
     getParentRoute: () => appDashboardAuthenticatedRoute,
   } as any)
+const appDashboardAuthenticatedOrdersOrderIdIndexRoute =
+  appDashboardAuthenticatedOrdersOrderIdIndexRouteImport.update({
+    id: '/orders/$orderId/',
+    path: '/orders/$orderId/',
+    getParentRoute: () => appDashboardAuthenticatedRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/sign-up': typeof authSignUpRoute
@@ -50,12 +57,14 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof appDashboardAuthenticatedRouteWithChildren
   '/dashboard/': typeof appDashboardAuthenticatedIndexRoute
   '/dashboard/orders/': typeof appDashboardAuthenticatedOrdersIndexRoute
+  '/dashboard/orders/$orderId/': typeof appDashboardAuthenticatedOrdersOrderIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/sign-up': typeof authSignUpRoute
   '/': typeof authIndexRoute
   '/dashboard': typeof appDashboardAuthenticatedIndexRoute
   '/dashboard/orders': typeof appDashboardAuthenticatedOrdersIndexRoute
+  '/dashboard/orders/$orderId': typeof appDashboardAuthenticatedOrdersOrderIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -64,6 +73,7 @@ export interface FileRoutesById {
   '/(app)/dashboard/_authenticated': typeof appDashboardAuthenticatedRouteWithChildren
   '/(app)/dashboard/_authenticated/': typeof appDashboardAuthenticatedIndexRoute
   '/(app)/dashboard/_authenticated/orders/': typeof appDashboardAuthenticatedOrdersIndexRoute
+  '/(app)/dashboard/_authenticated/orders/$orderId/': typeof appDashboardAuthenticatedOrdersOrderIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -73,8 +83,14 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/dashboard/'
     | '/dashboard/orders/'
+    | '/dashboard/orders/$orderId/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/sign-up' | '/' | '/dashboard' | '/dashboard/orders'
+  to:
+    | '/sign-up'
+    | '/'
+    | '/dashboard'
+    | '/dashboard/orders'
+    | '/dashboard/orders/$orderId'
   id:
     | '__root__'
     | '/(auth)/sign-up'
@@ -82,6 +98,7 @@ export interface FileRouteTypes {
     | '/(app)/dashboard/_authenticated'
     | '/(app)/dashboard/_authenticated/'
     | '/(app)/dashboard/_authenticated/orders/'
+    | '/(app)/dashboard/_authenticated/orders/$orderId/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -127,12 +144,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof appDashboardAuthenticatedOrdersIndexRouteImport
       parentRoute: typeof appDashboardAuthenticatedRoute
     }
+    '/(app)/dashboard/_authenticated/orders/$orderId/': {
+      id: '/(app)/dashboard/_authenticated/orders/$orderId/'
+      path: '/orders/$orderId'
+      fullPath: '/dashboard/orders/$orderId/'
+      preLoaderRoute: typeof appDashboardAuthenticatedOrdersOrderIdIndexRouteImport
+      parentRoute: typeof appDashboardAuthenticatedRoute
+    }
   }
 }
 
 interface appDashboardAuthenticatedRouteChildren {
   appDashboardAuthenticatedIndexRoute: typeof appDashboardAuthenticatedIndexRoute
   appDashboardAuthenticatedOrdersIndexRoute: typeof appDashboardAuthenticatedOrdersIndexRoute
+  appDashboardAuthenticatedOrdersOrderIdIndexRoute: typeof appDashboardAuthenticatedOrdersOrderIdIndexRoute
 }
 
 const appDashboardAuthenticatedRouteChildren: appDashboardAuthenticatedRouteChildren =
@@ -140,6 +165,8 @@ const appDashboardAuthenticatedRouteChildren: appDashboardAuthenticatedRouteChil
     appDashboardAuthenticatedIndexRoute: appDashboardAuthenticatedIndexRoute,
     appDashboardAuthenticatedOrdersIndexRoute:
       appDashboardAuthenticatedOrdersIndexRoute,
+    appDashboardAuthenticatedOrdersOrderIdIndexRoute:
+      appDashboardAuthenticatedOrdersOrderIdIndexRoute,
   }
 
 const appDashboardAuthenticatedRouteWithChildren =

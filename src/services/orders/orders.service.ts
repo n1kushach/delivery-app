@@ -20,11 +20,36 @@ export const fetchOrders = async () => {
   return data;
 };
 
+export const fetchOrderById = async (id: string) => {
+  const { data, error } = await supabase
+    .from('orders')
+    .select('*')
+    .eq('id', id)
+    .single();
+
+  if (error) throw new Error(error.message);
+  return data;
+};
+
 export const addOrder = async (order: TOrder) => {
   const { data, error } = await supabase.from('orders').insert([order]);
   if (error) {
     console.error('There was an error adding order,', error.message);
     throw new Error(error.message);
   }
+  return { success: true, data: data };
+};
+
+export const updateOrder = async (id: string, updates: Partial<TOrder>) => {
+  const { data, error } = await supabase
+    .from('ordersg')
+    .update(updates)
+    .eq('id', id);
+
+  if (error) {
+    console.error('There was an error updating order,', error.message);
+    throw new Error(error.message);
+  }
+
   return { success: true, data: data };
 };
