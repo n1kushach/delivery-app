@@ -8,15 +8,18 @@ const OrdersPage = () => {
   return (
     <div className="flex flex-col gap-4">
       <OrdersModal open={modal} setOpen={setModal} />
-      <div className="flex justify-end">
-        <Button
-          className="cursor-pointer rounded-sm"
-          type="button"
-          onClick={() => setModal(true)}
-          size="lg"
-        >
-          New
-        </Button>
+      <div className="flex justify-between">
+        <h1 className="font-mono">Orders</h1>
+        <div>
+          <Button
+            className="cursor-pointer rounded-sm uppercase"
+            type="button"
+            onClick={() => setModal(true)}
+            size="lg"
+          >
+            New Delivery
+          </Button>
+        </div>
       </div>
       <OrdersTable />
     </div>

@@ -22,9 +22,13 @@ import {
   ChevronUp,
   LogOut,
   User,
+  Sun,
+  Moon,
 } from 'lucide-react';
 import { useAuth } from '@/context/auth-context/use-auth';
 import { Link, useLocation } from '@tanstack/react-router';
+import { Button } from '@/components/ui/button';
+import { useTheme } from '@/hooks/use-theme';
 
 const adminNav = [
   { label: 'Dashboard', icon: LayoutDashboard, to: '/dashboard' },
@@ -33,6 +37,7 @@ const adminNav = [
 
 export function AppSidebar() {
   const { signOut, session } = useAuth();
+  const { theme, setTheme } = useTheme();
   const location = useLocation();
 
   const handleSignOut = async () => {
@@ -91,6 +96,17 @@ export function AppSidebar() {
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
               <DropdownMenuContent side="top" align="start" className="w-52">
+                <DropdownMenuItem
+                  onClick={() => {
+                    setTheme(theme == 'dark' ? 'light' : 'dark');
+                  }}
+                  className="text-destructive focus:text-destructive"
+                >
+                  <Button variant="outline" size="icon">
+                    <Sun className="h-[1.2rem] w-[1.2rem] scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90" />
+                    <Moon className="absolute h-[1.2rem] w-[1.2rem] scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0" />
+                  </Button>
+                </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={handleSignOut}
                   className="text-destructive focus:text-destructive"

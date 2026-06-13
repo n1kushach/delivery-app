@@ -37,6 +37,8 @@ const OrdersView = () => {
   const { mutate, isPending: loading } = useMutation({
     mutationFn: async (newOrder: TOrder) => {
       await updateOrder(orderId, newOrder);
+      toast.success('Success', { position: 'top-right' });
+      router.history.back();
     },
     onError: _err => {
       toast.error(_err.message, { position: 'top-right' });

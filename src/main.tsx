@@ -7,6 +7,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { routeTree } from './routeTree.gen';
 import { AuthContextProvider } from '@/context/auth-context/auth-context-provider';
 import { Toaster } from '@/components/ui/sonner';
+import { ThemeProvider } from '@/components/theme-provider';
 
 export const router = createRouter({
   routeTree,
@@ -24,10 +25,12 @@ declare module '@tanstack/react-router' {
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
-      <AuthContextProvider>
-        <RouterProvider router={router} />
-      </AuthContextProvider>
-      <Toaster />
+      <ThemeProvider defaultTheme="dark" storageKey="ui-theme">
+        <AuthContextProvider>
+          <RouterProvider router={router} />
+        </AuthContextProvider>
+        <Toaster />
+      </ThemeProvider>
     </QueryClientProvider>
   </StrictMode>
 );

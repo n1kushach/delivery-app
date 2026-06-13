@@ -42,7 +42,7 @@ export const addOrder = async (order: TOrder) => {
 
 export const updateOrder = async (id: string, updates: Partial<TOrder>) => {
   const { data, error } = await supabase
-    .from('ordersg')
+    .from('orders')
     .update(updates)
     .eq('id', id);
 
