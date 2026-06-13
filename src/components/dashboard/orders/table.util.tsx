@@ -1,6 +1,7 @@
-import StatusBadge from "@/components/dashboard/status-badge";
-import type { Orders } from "@/types/orders.types";
-import { createColumnHelper } from "@tanstack/react-table";
+import StatusBadge from '@/components/dashboard/status-badge';
+import { TableActionMenu } from '@/components/table-action-menu';
+import type { Orders } from '@/types/orders.types';
+import { createColumnHelper } from '@tanstack/react-table';
 
 const columnHelper = createColumnHelper<Orders>();
 
@@ -46,5 +47,10 @@ export const ORDER_COLUMNS = [
     size: 100,
     header: 'Total',
     cell: i => `$${i.getValue()}`,
+  }),
+  columnHelper.display({
+    id: 'actions',
+    header: () => null,
+    cell: ({ row }) => <TableActionMenu order={row.original} />,
   }),
 ];

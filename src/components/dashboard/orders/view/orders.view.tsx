@@ -54,6 +54,8 @@ const OrdersView = () => {
     queryFn: () => fetchOrderById(orderId),
     enabled: !!orderId,
     retry: 0,
+    refetchOnMount: 'always',
+    staleTime: 0,
   });
 
   const form = useForm({

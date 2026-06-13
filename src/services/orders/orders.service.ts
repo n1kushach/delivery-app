@@ -20,6 +20,12 @@ export const fetchOrders = async () => {
   return data;
 };
 
+export const deleteOrder = async (id: string) => {
+  const { error } = await supabase.from('orders').delete().eq('id', id);
+
+  if (error) throw new Error(error.message);
+};
+
 export const fetchOrderById = async (id: string) => {
   const { data, error } = await supabase
     .from('orders')

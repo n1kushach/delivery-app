@@ -8,18 +8,17 @@ import DashboardError from '@/components/dashboard/error';
 import { useQuery } from '@tanstack/react-query';
 import { fetchOrders } from '@/services/orders/orders.service';
 import { ORDER_COLUMNS } from '@/components/dashboard/orders/table.util';
-import { useNavigate } from '@tanstack/react-router';
+import type { Orders } from '@/types/orders.types';
 
 const OrdersTable = () => {
   const {
     data,
     isLoading: loading,
     error,
-  } = useQuery({
+  } = useQuery<Orders[], Error>({
     queryKey: ['orders'],
     queryFn: fetchOrders,
   });
-  const navigate = useNavigate();
   const table = useReactTable({
     data: data ?? [],
     columns: ORDER_COLUMNS,
@@ -59,14 +58,8 @@ const OrdersTable = () => {
             >
               {row.getVisibleCells().map(cell => (
                 <td
-                  onClick={() => {
-                    navigate({
-                      to: '/dashboard/orders/$orderId',
-                      params: { orderId: row.original.id },
-                    });
-                  }}
                   key={cell.id}
-                  className="cursor-pointer px-4 py-3 text-gray-700 dark:text-slate-300"
+                  className="px-4 py-3 text-gray-700 dark:text-slate-300"
                 >
                   {flexRender(cell.column.columnDef.cell, cell.getContext())}
                 </td>
