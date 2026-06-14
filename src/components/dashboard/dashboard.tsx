@@ -1,4 +1,5 @@
 import { DashboardChart } from '@/components/dashboard/bar-chart';
+import DashboardInfoCard from '@/components/dashboard/dashboard-info-card';
 import DashboardError from '@/components/dashboard/error';
 import PageLoader from '@/components/page-loader';
 import { fetchOrders } from '@/services/orders/orders.service';
@@ -73,33 +74,22 @@ export function DashboardMainPage() {
       )}
 
       <div className="grid grid-cols-1 gap-4 p-4 sm:grid-cols-3">
-        <div className="border-border bg-card rounded-xl border p-5">
-          <p className="text-muted-foreground text-sm">Top customer</p>
-          <p className="mt-1 truncate text-xl font-medium">
-            {data?.topUser.name}
-          </p>
-          <p className="text-muted-foreground mt-1 text-sm">
-            {data?.topUser.numberOfDeliveries} orders
-          </p>
-        </div>
+        <DashboardInfoCard
+          top="Top customer"
+          mid={data?.topUser.name as string}
+          bottom={`${data?.topUser.numberOfDeliveries} orders`}
+        />
+        <DashboardInfoCard
+          top="Top city"
+          mid={data?.topCity.name as string}
+          bottom={`${data?.topCity.numberOfOrders} orders`}
+        />
+        <DashboardInfoCard
+          top="Total revenue"
+          mid={`$${data?.totalRevenue.toLocaleString()}`}
+          bottom={`All orders completed`}
+        />
 
-        <div className="border-border bg-card rounded-xl border p-5">
-          <p className="text-muted-foreground text-sm">Top city</p>
-          <p className="mt-1 text-xl font-medium">{data?.topCity.name}</p>
-          <p className="text-muted-foreground mt-1 text-sm">
-            {data?.topCity.numberOfOrders} orders
-          </p>
-        </div>
-
-        <div className="border-border bg-card rounded-xl border p-5">
-          <p className="text-muted-foreground text-sm">Total revenue</p>
-          <p className="mt-1 text-xl font-medium">
-            ${data?.totalRevenue.toLocaleString()}
-          </p>
-          <p className="text-muted-foreground mt-1 text-sm">
-            All orders combined
-          </p>
-        </div>
         <div className="border-border bg-card rounded-xl border p-5">
           <DashboardChart data={data?.barChart} />
         </div>
