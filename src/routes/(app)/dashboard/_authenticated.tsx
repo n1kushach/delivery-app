@@ -41,7 +41,7 @@ export const Route = createFileRoute('/(app)/dashboard/_authenticated')({
           <div className="flex h-18 items-center border-b px-4">
             <SidebarTrigger />
           </div>
-          <div className="flex-1 p-6">
+          <div className="relative flex-1 p-6">
             <Outlet />
           </div>
         </main>

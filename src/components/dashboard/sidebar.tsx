@@ -60,7 +60,7 @@ export function AppSidebar() {
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel>Navigation</SidebarGroupLabel>
-          <SidebarMenu>
+          <SidebarMenu className="flex flex-col gap-2">
             {adminNav.map(({ label, icon: Icon, to }) => {
               const isActive = location.pathname === to;
               return (
