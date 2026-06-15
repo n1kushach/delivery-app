@@ -13,29 +13,32 @@ export function DashboardMainPage() {
     error,
   } = useQuery({
     queryKey: ['orders-chart'],
-    queryFn: fetchOrders,
+    queryFn: () => fetchOrders(1, 100),
     retry: false,
-    select: (orders: Orders[]) => {
+    select: (orders: { data: Orders[]; count: number }) => {
       const totals: Record<string, number> = {};
-      const deliveryCounts = orders.reduce(
+      const deliveryCounts = orders?.data?.reduce(
         (acc: Record<string, number>, order) => {
           acc[order.full_name] = (acc[order.full_name] || 0) + 1;
           return acc;
         },
         {}
       );
-      const totalRevenue = orders.reduce(
+      const totalRevenue = orders?.data.reduce(
         (acc, order) => acc + order.total_price,
         0
       );
-      const cityCounts = orders.reduce((acc: Record<string, number>, order) => {
-        acc[order.city] = (acc[order.city] || 0) + 1;
-        return acc;
-      }, {});
+      const cityCounts = orders?.data.reduce(
+        (acc: Record<string, number>, order) => {
+          acc[order.city] = (acc[order.city] || 0) + 1;
+          return acc;
+        },
+        {}
+      );
       const topUser = Object.entries(deliveryCounts).sort(
         ([, a], [, b]) => b - a
       )[0];
-      for (const order of orders) {
+      for (const order of orders.data) {
         totals[order.city] = (totals[order.city] || 0) + order.total_price;
       }
       const topCity = Object.entries(cityCounts).sort(

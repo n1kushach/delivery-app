@@ -14,10 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import {
-  fetchOrders,
-  fetchOrdersCount,
-} from '@/services/orders/orders.service';
+import { fetchOrders } from '@/services/orders/orders.service';
 import { Status, type Orders } from '@/types/orders.types';
 import { useQuery } from '@tanstack/react-query';
 import { useMemo, useState } from 'react';
@@ -33,11 +30,8 @@ const OrdersPage = () => {
     queryKey: ['orders', currentPage, postsPerPage],
     queryFn: () => fetchOrders(currentPage, postsPerPage),
   });
-  const { data: total } = useQuery({
-    queryKey: ['orders-count'],
-    queryFn: fetchOrdersCount,
-  });
-  const totalPages = total ? Math.ceil(total / postsPerPage) : 0;
+
+  const totalPages = data?.count ? Math.ceil(data?.count / postsPerPage) : 0;
   const [modal, setModal] = useState(false);
   const [search, setSearch] = useState('');
   const [status, setStatus] = useState<Status | 'all'>('all');

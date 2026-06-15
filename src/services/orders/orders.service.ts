@@ -10,15 +10,6 @@ export type TOrder = {
   total_price: string;
 };
 
-export const fetchOrdersCount = async (): Promise<number> => {
-  const { count, error } = await supabase
-    .from('orders')
-    .select('*', { count: 'exact', head: true });
-
-  if (error) throw new Error(error.message);
-  return count ?? 0;
-};
-
 export const fetchOrders = async (
   currentPage: number,
   orderPerPage: number
