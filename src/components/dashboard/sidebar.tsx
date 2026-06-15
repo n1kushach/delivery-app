@@ -26,7 +26,7 @@ import {
   Moon,
 } from 'lucide-react';
 import { useAuth } from '@/context/auth-context/use-auth';
-import { Link, useLocation } from '@tanstack/react-router';
+import { Link, useLocation, useRouter } from '@tanstack/react-router';
 import { Button } from '@/components/ui/button';
 import { useTheme } from '@/hooks/use-theme';
 
@@ -36,12 +36,14 @@ const adminNav = [
 ];
 
 export function AppSidebar() {
+  const router = useRouter();
   const { signOut, session } = useAuth();
   const { theme, setTheme } = useTheme();
   const location = useLocation();
 
   const handleSignOut = async () => {
     await signOut();
+    router.invalidate();
   };
 
   return (
