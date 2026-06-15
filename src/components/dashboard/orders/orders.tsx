@@ -1,3 +1,4 @@
+import DashboardPagination from '@/components/dashboard/dashboard-pagination';
 import DashboardError from '@/components/dashboard/error';
 import OrdersModal from '@/components/dashboard/orders/orders.modal';
 import OrdersSkeleton from '@/components/dashboard/orders/orders.skeleton';
@@ -13,28 +14,37 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { fetchOrders } from '@/services/orders/orders.service';
+import {
+  fetchOrders,
+  fetchOrdersCount,
+} from '@/services/orders/orders.service';
 import { Status, type Orders } from '@/types/orders.types';
 import { useQuery } from '@tanstack/react-query';
 import { useMemo, useState } from 'react';
 
 const OrdersPage = () => {
-  const [modal, setModal] = useState(false);
-  const [search, setSearch] = useState('');
-  const [status, setStatus] = useState<Status | 'all'>('all');
+  const postsPerPage = 20;
+  const [currentPage, setCurrentPage] = useState(1);
   const {
     data,
     isLoading: loading,
     error,
-  } = useQuery<Orders[], Error>({
-    queryKey: ['orders'],
-    queryFn: fetchOrders,
+  } = useQuery<{ data: Orders[]; count: number }, Error>({
+    queryKey: ['orders', currentPage, postsPerPage],
+    queryFn: () => fetchOrders(currentPage, postsPerPage),
   });
-
+  const { data: total } = useQuery({
+    queryKey: ['orders-count'],
+    queryFn: fetchOrdersCount,
+  });
+  const totalPages = total ? Math.ceil(total / postsPerPage) : 0;
+  const [modal, setModal] = useState(false);
+  const [search, setSearch] = useState('');
+  const [status, setStatus] = useState<Status | 'all'>('all');
   const filteredOrders = useMemo(() => {
     if (!data) return [];
 
-    return data.filter(order => {
+    return data?.data?.filter(order => {
       const matchesSearch =
         !search.trim() ||
         [order.full_name, order.address, order.city, order.phone].some(field =>
@@ -52,7 +62,7 @@ const OrdersPage = () => {
   return (
     <div className="flex flex-col gap-4">
       <OrdersModal open={modal} setOpen={setModal} />
-      <div className="flex justify-between">
+      <div className="flex items-center justify-between">
         <h1 className="font-mono">Orders</h1>
         <div className="flex items-center gap-4">
           <Input
@@ -93,6 +103,11 @@ const OrdersPage = () => {
         </div>
       </div>
       <OrdersTable data={filteredOrders} />
+      <DashboardPagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        setCurrentPage={setCurrentPage}
+      />
     </div>
   );
 };

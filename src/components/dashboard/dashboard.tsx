@@ -17,7 +17,6 @@ export function DashboardMainPage() {
     retry: false,
     select: (orders: Orders[]) => {
       const totals: Record<string, number> = {};
-
       const deliveryCounts = orders.reduce(
         (acc: Record<string, number>, order) => {
           acc[order.full_name] = (acc[order.full_name] || 0) + 1;
@@ -29,12 +28,10 @@ export function DashboardMainPage() {
         (acc, order) => acc + order.total_price,
         0
       );
-
       const cityCounts = orders.reduce((acc: Record<string, number>, order) => {
         acc[order.city] = (acc[order.city] || 0) + 1;
         return acc;
       }, {});
-
       const topUser = Object.entries(deliveryCounts).sort(
         ([, a], [, b]) => b - a
       )[0];
