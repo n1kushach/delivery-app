@@ -11,6 +11,19 @@ import {
 export const Route = createFileRoute('/(app)/dashboard/_authenticated')({
   beforeLoad: async ({ location }) => {
     try {
+      // getSession() reads from localStorage instantly (sync-like)
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      if (!session) {
+        throw redirect({
+          to: '/',
+          search: { redirect: location.href },
+        });
+      }
+
+      // Optionally verify with server (slower but more secure)
       const {
         data: { user },
         error,
@@ -26,11 +39,7 @@ export const Route = createFileRoute('/(app)/dashboard/_authenticated')({
       return { user };
     } catch (error) {
       if (isRedirect(error)) throw error;
-
-      throw redirect({
-        to: '/',
-        search: { redirect: location.href },
-      });
+      throw redirect({ to: '/', search: { redirect: location.href } });
     }
   },
   component: () => (
