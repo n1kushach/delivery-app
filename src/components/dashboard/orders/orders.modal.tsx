@@ -29,12 +29,14 @@ import { useForm } from '@tanstack/react-form';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 interface IOrdersModal {
+  currentPage: number;
+  postsPerPage: number;
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const OrdersModal = (props: IOrdersModal) => {
-  const { open, setOpen } = props;
+  const { currentPage, postsPerPage, open, setOpen } = props;
   const queryClient = useQueryClient();
   const { mutate, isPending: loading } = useMutation({
     mutationFn: async (newOrder: TOrder) => {
@@ -42,19 +44,31 @@ const OrdersModal = (props: IOrdersModal) => {
     },
     onMutate: async newOrder => {
       setOpen(false);
-      await queryClient.cancelQueries({ queryKey: ['orders'] });
+      await queryClient.cancelQueries({
+        queryKey: ['orders', currentPage, postsPerPage],
+      });
 
-      const previousOrders = queryClient.getQueryData<TOrder[]>(['orders']);
+      const previousOrders = queryClient.getQueryData<{
+        data: TOrder[];
+        count: number;
+      }>(['orders', currentPage, postsPerPage]);
 
-      queryClient.setQueryData<TOrder[]>(['orders'], old => [
-        newOrder,
-        ...(old ?? []),
-      ]);
+      queryClient.setQueryData<{ data: TOrder[]; count: number }>(
+        ['orders', currentPage, postsPerPage],
+        old => ({
+          data: [newOrder, ...(old?.data ?? [])],
+          count: (old?.count ?? 0) + 1,
+        })
+      );
 
       return { previousOrders };
     },
+
     onError: (_err, _newOrder, context) => {
-      queryClient.setQueryData(['orders'], context?.previousOrders);
+      queryClient.setQueryData(
+        ['orders', currentPage, postsPerPage],
+        context?.previousOrders
+      );
     },
 
     // Uncomment if refetch needed onSuccess

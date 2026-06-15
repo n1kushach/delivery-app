@@ -55,7 +55,12 @@ const OrdersPage = () => {
   if (error) return <DashboardError message={error.message} variant="page" />;
   return (
     <div className="flex flex-col gap-4">
-      <OrdersModal open={modal} setOpen={setModal} />
+      <OrdersModal
+        currentPage={currentPage}
+        postsPerPage={postsPerPage}
+        open={modal}
+        setOpen={setModal}
+      />
       <div className="flex items-center justify-between">
         <h1 className="font-mono">Orders</h1>
         <div className="flex items-center gap-4">
