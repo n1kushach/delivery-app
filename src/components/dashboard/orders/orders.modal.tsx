@@ -27,6 +27,7 @@ import { CreateOrderSchema } from '@/schemas/create-order/create-order.schema';
 import { addOrder, type TOrder } from '@/services/orders/orders.service';
 import { useForm } from '@tanstack/react-form';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
 
 interface IOrdersModal {
   currentPage: number;
@@ -69,6 +70,10 @@ const OrdersModal = (props: IOrdersModal) => {
         ['orders', currentPage, postsPerPage],
         context?.previousOrders
       );
+      toast.error(_err.message, { position: 'top-right' });
+    },
+    onSuccess: () => {
+      toast.success('Order added successfully', { position: 'top-right' });
     },
 
     // Uncomment if refetch needed onSuccess
