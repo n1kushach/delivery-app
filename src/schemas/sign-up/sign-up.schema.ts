@@ -14,6 +14,7 @@ export const SignUpSchema = z
       .min(1, 'Phone number is required')
       .regex(/^(\+995)?5\d{8}$/, 'Please enter a valid Georgian phone number'),
     email: z.email({ pattern: z.regexes.html5Email }),
+    role: z.enum(['customer', 'driver'], { error: 'Select your role' }),
     password: z
       .string()
       .min(8, 'Password must be at least 8 characters long')

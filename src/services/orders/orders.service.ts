@@ -8,6 +8,8 @@ export type TOrder = {
   status: string;
   notes: string;
   total_price: string;
+  driver_id: string | null;
+  customer_id: string | null;
 };
 
 export const fetchOrders = async (

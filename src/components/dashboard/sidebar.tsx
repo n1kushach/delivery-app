@@ -29,6 +29,7 @@ import { useAuth } from '@/context/auth-context/use-auth';
 import { Link, useLocation, useRouter } from '@tanstack/react-router';
 import { Button } from '@/components/ui/button';
 import { useTheme } from '@/hooks/use-theme';
+import { useQueryClient } from '@tanstack/react-query';
 
 const adminNav = [
   { label: 'Dashboard', icon: LayoutDashboard, to: '/dashboard' },
@@ -37,13 +38,15 @@ const adminNav = [
 
 export function AppSidebar() {
   const router = useRouter();
-  const { signOut, session } = useAuth();
+  const { signOut, profile } = useAuth();
   const { theme, setTheme } = useTheme();
   const location = useLocation();
+  const queryClient = useQueryClient();
 
   const handleSignOut = async () => {
     await signOut();
     router.invalidate();
+    queryClient.clear();
   };
 
   return (
@@ -89,9 +92,12 @@ export function AppSidebar() {
                   <div className="bg-muted flex h-7 w-7 items-center justify-center rounded-full">
                     <User className="text-muted-foreground h-4 w-4" />
                   </div>
-                  <div className="flex flex-col items-start text-left">
+                  <div className="flex flex-col items-start gap-2 text-left">
                     <span className="text-sm leading-tight font-medium whitespace-nowrap">
-                      {session?.user?.user_metadata?.name}
+                      {profile?.name}
+                    </span>
+                    <span className="text-[10px] leading-tight font-normal whitespace-nowrap">
+                      {profile?.role.toUpperCase()}
                     </span>
                   </div>
                   <ChevronUp className="text-muted-foreground ml-auto h-4 w-4" />
