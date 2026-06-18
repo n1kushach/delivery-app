@@ -60,8 +60,6 @@ export function DashboardMainPage() {
     },
   });
 
-  console.log(data, 'DATA');
-
   if (loading) return <PageLoader />;
   if (error) return <DashboardError message={error.message} variant="page" />;
 

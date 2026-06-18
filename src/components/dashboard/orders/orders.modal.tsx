@@ -325,7 +325,10 @@ const OrdersModal = (props: IOrdersModal) => {
                                   field.handleBlur();
                                 }}
                               >
-                                <SelectTrigger>
+                                <SelectTrigger
+                                  onBlur={field.handleBlur}
+                                  aria-invalid={isInvalid}
+                                >
                                   <SelectValue
                                     id={field.name}
                                     placeholder="Select status"
@@ -384,7 +387,10 @@ const OrdersModal = (props: IOrdersModal) => {
                                   field.handleBlur();
                                 }}
                               >
-                                <SelectTrigger>
+                                <SelectTrigger
+                                  onBlur={field.handleBlur}
+                                  aria-invalid={isInvalid}
+                                >
                                   <SelectValue
                                     id={field.name}
                                     placeholder="Select customer"
@@ -431,7 +437,10 @@ const OrdersModal = (props: IOrdersModal) => {
                                   field.handleBlur();
                                 }}
                               >
-                                <SelectTrigger>
+                                <SelectTrigger
+                                  onBlur={field.handleBlur}
+                                  aria-invalid={isInvalid}
+                                >
                                   <SelectValue
                                     id={field.name}
                                     placeholder="Select driver"

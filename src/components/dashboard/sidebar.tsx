@@ -105,6 +105,9 @@ export function AppSidebar() {
               </DropdownMenuTrigger>
               <DropdownMenuContent side="top" align="start" className="w-52">
                 <DropdownMenuItem
+                  onSelect={e => {
+                    e.preventDefault();
+                  }}
                   onClick={() => {
                     setTheme(theme == 'dark' ? 'light' : 'dark');
                   }}

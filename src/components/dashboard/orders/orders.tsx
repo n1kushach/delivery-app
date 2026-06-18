@@ -102,11 +102,13 @@ const OrdersPage = () => {
         </div>
       </div>
       <OrdersTable data={filteredOrders} />
-      <DashboardPagination
-        currentPage={currentPage}
-        totalPages={totalPages}
-        setCurrentPage={setCurrentPage}
-      />
+      {totalPages > 1 && (
+        <DashboardPagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          setCurrentPage={setCurrentPage}
+        />
+      )}
     </div>
   );
 };

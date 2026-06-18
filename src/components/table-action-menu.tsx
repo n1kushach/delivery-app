@@ -52,7 +52,7 @@ export const TableActionMenu = ({ order }: TableActionMenuProps) => {
   };
 
   return (
-    <div ref={ref} className="relative flex justify-end">
+    <div ref={ref} className="flex justify-end">
       <ConfirmModal
         open={modal}
         setOpen={setModal}
@@ -71,7 +71,7 @@ export const TableActionMenu = ({ order }: TableActionMenuProps) => {
       </button>
 
       {open && (
-        <div className="absolute top-8 right-0 z-50 min-w-32.5 rounded-lg border border-gray-200 bg-white py-1 shadow-lg dark:border-slate-700 dark:bg-slate-800 dark:shadow-slate-900/50">
+        <div className="absolute top-8 right-12.5 z-50 min-w-32.5 rounded-lg border border-gray-200 bg-white py-1 shadow-lg dark:border-slate-700 dark:bg-slate-800 dark:shadow-slate-900/50">
           <button
             type="button"
             onClick={handleEdit}

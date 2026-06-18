@@ -30,7 +30,7 @@ const OrdersTable = (props: IOrdersTable) => {
   });
 
   return (
-    <div className="overflow-x-auto rounded-xl border border-gray-200 shadow-sm dark:border-slate-800 dark:shadow-none">
+    <div className="relative overflow-x-auto rounded-xl border border-gray-200 shadow-sm dark:border-slate-800 dark:shadow-none">
       <table className="min-w-full divide-y divide-gray-200 text-sm dark:divide-slate-800">
         <thead className="bg-gray-50 dark:bg-slate-900/60">
           {table.getHeaderGroups().map(headerGroup => (
