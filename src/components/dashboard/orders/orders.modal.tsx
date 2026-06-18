@@ -65,7 +65,6 @@ const OrdersModal = (props: IOrdersModal) => {
     },
     onMutate: async newOrder => {
       setOpen(false);
-      form.reset();
       await queryClient.cancelQueries({
         queryKey: ['orders', currentPage, postsPerPage],
       });
@@ -82,7 +81,6 @@ const OrdersModal = (props: IOrdersModal) => {
           count: (old?.count ?? 0) + 1,
         })
       );
-
       return { previousOrders };
     },
 
@@ -95,6 +93,7 @@ const OrdersModal = (props: IOrdersModal) => {
     },
     onSuccess: () => {
       toast.success('Order added successfully', { position: 'top-right' });
+      form.reset();
     },
     // Uncomment if refetch needed onSuccess
     // onSettled: () => {

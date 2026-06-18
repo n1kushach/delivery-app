@@ -30,27 +30,23 @@ import { toast } from 'sonner';
 import type { SingleOrder } from '@/types/orders.types';
 import { getAllCustomers } from '@/services/orders/customers.service';
 import { getAllDrivers } from '@/services/orders/drivers.service';
+import { useAuth } from '@/context/auth-context/use-auth';
 
 const OrdersView = () => {
+  const { profile } = useAuth();
   const router = useRouter();
   const { orderId } = useLoaderData({
     from: '/(app)/dashboard/_authenticated/orders/$orderId/',
   });
-  const {
-    data: customers,
-    isLoading: customersLoading,
-    // error: customersError,
-  } = useQuery({
+  const { data: customers, isLoading: customersLoading } = useQuery({
     queryKey: ['customers'],
     queryFn: () => getAllCustomers(),
+    enabled: profile?.role == 'admin',
   });
-  const {
-    data: drivers,
-    isLoading: driversLoading,
-    // error: driversError,
-  } = useQuery({
+  const { data: drivers, isLoading: driversLoading } = useQuery({
     queryKey: ['drivers'],
     queryFn: () => getAllDrivers(),
+    enabled: profile?.role == 'admin',
   });
   const { mutate, isPending: loading } = useMutation({
     mutationFn: async (newOrder: TOrder) => {
@@ -125,6 +121,13 @@ const OrdersView = () => {
   if (isQueryLoading || customersLoading || driversLoading)
     return <OrdersViewSkeleton />;
   if (error) return <DashboardError message={error.message} variant="page" />;
+  if (profile?.role !== 'admin')
+    return (
+      <DashboardError
+        message={'Viewing this page is forbidden'}
+        variant="page"
+      />
+    );
 
   return (
     <div className="flex flex-col">
