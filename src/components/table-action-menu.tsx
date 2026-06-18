@@ -6,6 +6,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { deleteOrder } from '@/services/orders/orders.service';
 import { toast } from 'sonner';
 import ConfirmModal from '@/components/confirm-modal';
+import { useAuth } from '@/context/auth-context/use-auth';
 
 interface TableActionMenuProps {
   order: Orders;
@@ -13,6 +14,8 @@ interface TableActionMenuProps {
 
 export const TableActionMenu = ({ order }: TableActionMenuProps) => {
   const queryClient = useQueryClient();
+  const { profile } = useAuth();
+  const role = profile?.role;
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [modal, setModal] = useState(false);
@@ -52,7 +55,7 @@ export const TableActionMenu = ({ order }: TableActionMenuProps) => {
   };
 
   return (
-    <div ref={ref} className="flex justify-end">
+    <div ref={ref} className="relative flex justify-end">
       <ConfirmModal
         open={modal}
         setOpen={setModal}
@@ -71,7 +74,7 @@ export const TableActionMenu = ({ order }: TableActionMenuProps) => {
       </button>
 
       {open && (
-        <div className="absolute top-8 right-12.5 z-50 min-w-32.5 rounded-lg border border-gray-200 bg-white py-1 shadow-lg dark:border-slate-700 dark:bg-slate-800 dark:shadow-slate-900/50">
+        <div className="absolute top-full right-0 z-50 min-w-32.5 rounded-lg border border-gray-200 bg-white py-1 shadow-lg dark:border-slate-700 dark:bg-slate-800 dark:shadow-slate-900/50">
           <button
             type="button"
             onClick={handleEdit}
@@ -80,17 +83,19 @@ export const TableActionMenu = ({ order }: TableActionMenuProps) => {
             <Pencil size={14} className="text-gray-400 dark:text-slate-400" />
             Edit
           </button>
-          <button
-            disabled={loading}
-            type="button"
-            onClick={() => {
-              setModal(true);
-            }}
-            className="flex w-full cursor-pointer items-center gap-2 px-3 py-2 text-sm text-red-600 transition-colors hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-500/10"
-          >
-            <Trash2 size={14} />
-            Delete
-          </button>
+          {role == 'admin' && (
+            <button
+              disabled={loading}
+              type="button"
+              onClick={() => {
+                setModal(true);
+              }}
+              className="flex w-full cursor-pointer items-center gap-2 px-3 py-2 text-sm text-red-600 transition-colors hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-500/10"
+            >
+              <Trash2 size={14} />
+              Delete
+            </button>
+          )}
         </div>
       )}
     </div>

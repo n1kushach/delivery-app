@@ -14,12 +14,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { useAuth } from '@/context/auth-context/use-auth';
 import { fetchOrders } from '@/services/orders/orders.service';
 import { Status, type Orders } from '@/types/orders.types';
 import { useQuery } from '@tanstack/react-query';
 import { useMemo, useState } from 'react';
 
 const OrdersPage = () => {
+  const { profile } = useAuth();
   const postsPerPage = 20;
   const [currentPage, setCurrentPage] = useState(1);
   const {
@@ -91,14 +93,16 @@ const OrdersPage = () => {
               </SelectGroup>
             </SelectContent>
           </Select>
-          <Button
-            className="cursor-pointer rounded-sm uppercase"
-            type="button"
-            onClick={() => setModal(true)}
-            size="lg"
-          >
-            New Delivery
-          </Button>
+          {profile?.role == 'admin' && (
+            <Button
+              className="cursor-pointer rounded-sm uppercase"
+              type="button"
+              onClick={() => setModal(true)}
+              size="lg"
+            >
+              New Delivery
+            </Button>
+          )}
         </div>
       </div>
       <OrdersTable data={filteredOrders} />

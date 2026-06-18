@@ -29,3 +29,18 @@ export const Status = {
 
 export type Notes = (typeof Notes)[keyof typeof Notes];
 export type Status = (typeof Status)[keyof typeof Status];
+
+export interface SingleOrder {
+  address: string;
+  city: string;
+  created_at: Date;
+  customer_id: string | null;
+  driver_id: string | null;
+  full_name: string;
+  id: string;
+  notes: string;
+  phone: string;
+  status: string;
+  total_price: number;
+  updated_at: Date;
+}
