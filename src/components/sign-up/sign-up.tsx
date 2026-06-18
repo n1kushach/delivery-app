@@ -14,6 +14,24 @@ import { useNavigate } from '@tanstack/react-router';
 import { useForm } from '@tanstack/react-form';
 import { SignUpSchema } from '@/schemas/sign-up/sign-up.schema';
 import { toast } from 'sonner';
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import type { Role } from '@/context/auth-context/auth-context-types';
+
+interface SignUpFormValues {
+  email: string;
+  name: string;
+  phone: string;
+  role: Role;
+  password: string;
+  confirmPassword: string;
+}
 
 export function SignUpForm({
   className,
@@ -23,14 +41,17 @@ export function SignUpForm({
   const [loading, setLoading] = useState(false);
   const { signUpNewUser } = useAuth();
 
+  const defaultValues: SignUpFormValues = {
+    email: '',
+    name: '',
+    phone: '',
+    role: 'customer',
+    password: '',
+    confirmPassword: '',
+  };
+
   const form = useForm({
-    defaultValues: {
-      email: '',
-      name: '',
-      phone: '',
-      password: '',
-      confirmPassword: '',
-    },
+    defaultValues: defaultValues,
     validators: {
       onSubmitAsync: SignUpSchema,
     },
@@ -40,7 +61,8 @@ export function SignUpForm({
         value.email,
         value.password,
         value.name,
-        value.phone
+        value.phone,
+        value.role
       );
       if (result.success) {
         navigate({ to: '/dashboard' });
@@ -154,6 +176,47 @@ export function SignUpForm({
                       );
                     }}
                   />
+                  <form.Field
+                    name="role"
+                    children={field => {
+                      const isInvalid =
+                        field.state.meta.isTouched && !field.state.meta.isValid;
+                      return (
+                        <Field data-invalid={isInvalid}>
+                          <FieldLabel htmlFor={field.name}>Role</FieldLabel>
+                          <Select
+                            value={field.state.value}
+                            disabled={loading}
+                            name={field.name}
+                            autoComplete="off"
+                            onValueChange={value => {
+                              field.handleChange(value as Role);
+                            }}
+                          >
+                            <SelectTrigger
+                              onBlur={field.handleBlur}
+                              aria-invalid={isInvalid}
+                              className="w-full max-w-full"
+                            >
+                              <SelectValue placeholder="Select role" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectGroup>
+                                <SelectItem value="customer">
+                                  Customer
+                                </SelectItem>
+                                <SelectItem value="driver">Driver</SelectItem>
+                              </SelectGroup>
+                            </SelectContent>
+                          </Select>
+                          {isInvalid && (
+                            <FieldError errors={field.state.meta.errors} />
+                          )}
+                        </Field>
+                      );
+                    }}
+                  />
+
                   <Field>
                     <form.Field
                       name="password"

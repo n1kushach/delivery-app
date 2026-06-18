@@ -27,13 +27,27 @@ import DashboardError from '@/components/dashboard/error';
 import { OrdersViewSkeleton } from '@/components/dashboard/orders/view/orders.view.skeleton';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
+import type { SingleOrder } from '@/types/orders.types';
+import { getAllCustomers } from '@/services/orders/customers.service';
+import { getAllDrivers } from '@/services/orders/drivers.service';
+import { useAuth } from '@/context/auth-context/use-auth';
 
 const OrdersView = () => {
+  const { profile } = useAuth();
   const router = useRouter();
   const { orderId } = useLoaderData({
     from: '/(app)/dashboard/_authenticated/orders/$orderId/',
   });
-
+  const { data: customers, isLoading: customersLoading } = useQuery({
+    queryKey: ['customers'],
+    queryFn: () => getAllCustomers(),
+    enabled: profile?.role == 'admin',
+  });
+  const { data: drivers, isLoading: driversLoading } = useQuery({
+    queryKey: ['drivers'],
+    queryFn: () => getAllDrivers(),
+    enabled: profile?.role == 'admin',
+  });
   const { mutate, isPending: loading } = useMutation({
     mutationFn: async (newOrder: TOrder) => {
       await updateOrder(orderId, newOrder);
@@ -49,7 +63,7 @@ const OrdersView = () => {
     data,
     isLoading: isQueryLoading,
     error,
-  } = useQuery({
+  } = useQuery<SingleOrder, Error>({
     queryKey: ['orders', orderId],
     queryFn: () => fetchOrderById(orderId),
     enabled: !!orderId,
@@ -67,6 +81,8 @@ const OrdersView = () => {
       status: '',
       notes: '',
       total_price: '',
+      driver: '' as string | null,
+      customer: '' as string | null,
     },
     validators: {
       onSubmitAsync: CreateOrderSchema,
@@ -80,25 +96,38 @@ const OrdersView = () => {
         status: value.status,
         notes: value.notes,
         total_price: value.total_price,
+        driver_id: value.driver || null,
+        customer_id: value.customer || null,
       });
+    },
+    onSubmitInvalid: ({ value, formApi }) => {
+      console.log('Validation failed:', formApi.state.errors, value);
     },
   });
 
   useEffect(() => {
     if (!data) return;
-    form.reset({
-      full_name: data?.full_name,
-      phone: data?.phone,
-      address: data?.address,
-      city: data?.city,
-      status: data?.status,
-      notes: data?.notes,
-      total_price: data?.total_price.toString(),
-    });
+    form.setFieldValue('full_name', data?.full_name);
+    form.setFieldValue('phone', data?.phone);
+    form.setFieldValue('address', data?.address);
+    form.setFieldValue('city', data?.city);
+    form.setFieldValue('status', data?.status);
+    form.setFieldValue('notes', data?.notes);
+    form.setFieldValue('total_price', data?.total_price.toString());
+    form.setFieldValue('driver', data?.driver_id);
+    form.setFieldValue('customer', data?.customer_id);
   }, [data, form]);
 
-  if (isQueryLoading) return <OrdersViewSkeleton />;
+  if (isQueryLoading || customersLoading || driversLoading)
+    return <OrdersViewSkeleton />;
   if (error) return <DashboardError message={error.message} variant="page" />;
+  if (profile?.role !== 'admin')
+    return (
+      <DashboardError
+        message={'Viewing this page is forbidden'}
+        variant="page"
+      />
+    );
 
   return (
     <div className="flex flex-col">
@@ -249,6 +278,93 @@ const OrdersView = () => {
             }}
           />
           <form.Field
+            name="customer"
+            children={field => {
+              const isInvalid =
+                field.state.meta.isTouched && !field.state.meta.isValid;
+              return (
+                <Field data-invalid={isInvalid}>
+                  <FieldLabel htmlFor={field.name}>Customer</FieldLabel>
+                  <Select
+                    key={field.state.value as string} // 👈 add this
+                    disabled={loading}
+                    name={field.name}
+                    value={field.state.value as string | undefined}
+                    onValueChange={value => {
+                      field.handleChange(value === 'none' ? '' : value);
+                      field.handleBlur();
+                    }}
+                  >
+                    <SelectTrigger
+                      onBlur={field.handleBlur}
+                      aria-invalid={isInvalid}
+                    >
+                      <SelectValue
+                        id={field.name}
+                        placeholder="Select customer"
+                      />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        <SelectItem value="none">None</SelectItem>
+                        {customers?.map(item => (
+                          <SelectItem key={item.id} value={item.id}>
+                            {item.name}
+                          </SelectItem>
+                        ))}
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                  {isInvalid && <FieldError errors={field.state.meta.errors} />}
+                </Field>
+              );
+            }}
+          />
+
+          <form.Field
+            name="driver"
+            children={field => {
+              const isInvalid =
+                field.state.meta.isTouched && !field.state.meta.isValid;
+              return (
+                <Field data-invalid={isInvalid}>
+                  <FieldLabel htmlFor={field.name}>Driver</FieldLabel>
+                  <Select
+                    key={field.state.value as string} // 👈 add this
+                    disabled={loading}
+                    name={field.name}
+                    value={field.state.value as string | undefined}
+                    onValueChange={value => {
+                      field.handleChange(value === 'none' ? '' : value);
+                      field.handleBlur();
+                    }}
+                  >
+                    <SelectTrigger
+                      onBlur={field.handleBlur}
+                      aria-invalid={isInvalid}
+                    >
+                      <SelectValue
+                        id={field.name}
+                        placeholder="Select driver"
+                      />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        <SelectItem value="none">None</SelectItem>
+                        {drivers?.map(item => (
+                          <SelectItem key={item.id} value={item.id}>
+                            {item.name}
+                          </SelectItem>
+                        ))}
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                  {isInvalid && <FieldError errors={field.state.meta.errors} />}
+                </Field>
+              );
+            }}
+          />
+          <form.Field
             name="notes"
             children={field => {
               const isInvalid =
@@ -306,7 +422,6 @@ const OrdersView = () => {
             onClick={() => {
               form.handleSubmit();
             }}
-            type="submit"
           >
             Submit
           </Button>

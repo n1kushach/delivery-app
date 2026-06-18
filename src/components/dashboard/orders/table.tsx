@@ -30,15 +30,15 @@ const OrdersTable = (props: IOrdersTable) => {
   });
 
   return (
-    <div className="overflow-x-auto rounded-xl border border-gray-200 shadow-sm dark:border-slate-800 dark:shadow-none">
+    <div className="relative rounded-xl  border border-gray-200 shadow-sm dark:border-slate-800 dark:shadow-none">
       <table className="min-w-full divide-y divide-gray-200 text-sm dark:divide-slate-800">
         <thead className="bg-gray-50 dark:bg-slate-900/60">
           {table.getHeaderGroups().map(headerGroup => (
             <tr key={headerGroup.id}>
-              {headerGroup.headers.map(header => (
+              {headerGroup.headers.map((header, index) => (
                 <th
                   key={header.id}
-                  className="px-4 py-3 text-left text-xs font-semibold tracking-wider text-gray-500 uppercase dark:text-slate-400"
+                  className={`${index == 0 && 'rounded-tl-xl!'} ${index + 1 == headerGroup.headers.length && 'rounded-tr-xl!'} px-4 py-3 text-left text-xs font-semibold tracking-wider text-gray-500 uppercase dark:text-slate-400`}
                 >
                   {header.isPlaceholder
                     ? null

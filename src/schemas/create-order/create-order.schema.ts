@@ -1,6 +1,8 @@
 import * as z from 'zod';
+
+// schema — no .default(), just plain string
 export const CreateOrderSchema = z.object({
-  full_name: z.string().min(1, { error: 'Required Field!' }),
+  full_name: z.string().min(1, 'Required Field!'),
   phone: z
     .string()
     .trim()
@@ -11,4 +13,6 @@ export const CreateOrderSchema = z.object({
   status: z.string().min(1, 'Required Field!'),
   notes: z.string().min(1, 'Required Field!'),
   total_price: z.string().min(1, 'Required Field!'),
+  driver: z.string(),
+  customer: z.string(),
 });

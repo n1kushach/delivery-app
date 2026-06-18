@@ -1,22 +1,33 @@
+import type {
+  Profile,
+  Role,
+  SignInResult,
+  SignUpResult,
+} from '@/context/auth-context/auth-context-types';
 import { supabase } from '@/utils/supabase';
-import type { AuthError, Session, User } from '@supabase/supabase-js';
 
-export type Role = 'customer' | 'driver';
+export const getProfile = async (userId: string): Promise<Profile | null> => {
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('id', userId)
+    .single();
 
-export type SignUpResult =
-  | { success: false; error: AuthError; message: string }
-  | { success: true; data: { user: User | null; session: Session | null } };
+  if (error) {
+    console.error('Error fetching profile: ', error.message);
+    return null;
+  }
 
-export type SignInResult =
-  | { success: false; error: AuthError }
-  | { success: true; data: { user: User; session: Session } };
+  return data as Profile;
+};
 
 //sign-up
 export const signUpNewUser = async (
   email: string,
   password: string,
   name: string,
-  phone: string
+  phone: string,
+  role: Exclude<Role, 'admin>'>
 ): Promise<SignUpResult> => {
   const { data, error } = await supabase.auth.signUp({
     email: email,
@@ -25,6 +36,7 @@ export const signUpNewUser = async (
       data: {
         name: name,
         phone: phone,
+        user_role: role,
       },
     },
   });
